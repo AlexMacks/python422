@@ -3,23 +3,24 @@ from django.http import HttpResponse
 
 # Create your views here.
 def main(request):
-    pass
+    return HttpResponse("Главная страница")
 
 def catalog_categories(request):
-    pass
+    return HttpResponse("Каталог категорий")
 
-def category_detail(request):
-    pass
+def category_detail(request, category_slug):
+    return HttpResponse(f"Страница категории {category_slug}")
 
 def catalog_tags(request):
-    pass
+    return HttpResponse("Каталог тегов")
 
-def tag_detail(request):
-    pass
+def tag_detail(request, tag_slug):
+    return HttpResponse(f"страница тега {tag_slug} ")
 
 def catalog_posts(request):
-    pass
+    return HttpResponse("Каталог постов")
 
-def post_detail(request):
-    pass
+def post_detail(request, post_slug):
+    return HttpResponse(f"страница поста {post_slug} ")
+
 

@@ -6,11 +6,12 @@ from python_blog.views import catalog_categories, catalog_tags, catalog_posts, c
 urlpatterns = [
     # Категории
     path('categories/', catalog_categories),
-    path('categories/<slug:slug>/', category_detail),
+    path('categories/<slug:category_slug>/', category_detail),
     # Теги
     path('tags/', catalog_tags),
-    path('tags/<slug:slug>/', tag_detail),
+    path('tags/<slug:tag_slug>/', tag_detail),
     # Посты
-    path('', post_detail),
-    path('<slug:slug>/', catalog_posts),
+    path('', catalog_posts),
+    path('<slug:post_slug>/', post_detail),
+    
 ]
