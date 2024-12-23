@@ -1,0 +1,22 @@
+{% comment %} ./base.html Базовый шаблон для всего проекта {% endcomment %}
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- Базовый шаблон. Блок title -->
+    <title>{% block title %} {% endblock %}</title>
+</head>
+<body>
+    <header>
+    {% comment %} Будет подключатся menu_include.html {% endcomment %}
+    </header>
+    <!-- Базовый шаблон. Блок main -->
+    <main>
+        {% block content %} {% endblock %}
+    </main>
+    <footer>
+    {% block footer %} Все права защищены. Python422. Академия Топ. 2025 г. {%endblock %}
+    </footer>
+</body>
+</html>
