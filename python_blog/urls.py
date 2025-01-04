@@ -1,8 +1,8 @@
 # APP URLS
-app_name = 'blog'
 from django.contrib import admin
 from django.urls import path
 from python_blog.views import catalog_categories, catalog_tags, catalog_posts, category_detail, tag_detail, post_detail
+app_name = 'blog'
 
 urlpatterns = [
     # Каталог постов

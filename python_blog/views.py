@@ -3,7 +3,6 @@ from django.http import HttpResponse
 from django.urls import reverse
 
 # Create your views here.
-
 CATEGORIES = [
     {'slug': 'python', 'name': 'Python'},
     {'slug': 'django', 'name': 'Django'},
@@ -11,27 +10,38 @@ CATEGORIES = [
     {'slug': 'docker', 'name': 'Docker'},
     {'slug': 'linux', 'name': 'Linux'},
 ]
+
+MENU_ITEMS = [
+    {"title": "Главная", "url_name": "main"},
+    {"title": "Все посты", "url_name": "blog:posts"},
+    {"title": "Категории", "url_name": "blog:categories"},
+    {"title": "Теги", "url_name": "blog:tags"},
+]
+
 def main(request):
     catalog_categories_url = reverse('blog:categories')
     catalog_tags_url = reverse('blog:tags')
-    return HttpResponse(f"""
-        <h1>Главная страница</h1>
-        <p><a href="{catalog_categories_url}">Каталог категорий</a></p>
-        <p><a href="{catalog_tags_url}">Каталог тегов</a></p>
-    """)
+    context = {
+        "title": "Главная страница",
+        "text": "Текст главной страницы",
+        "user_status": "moderator",
+        "menu_items": MENU_ITEMS,
+    }
+    return render(request, "main.html", context)
 
 
 def catalog_categories(request):
     links = []
     for category in CATEGORIES:
-        url = reverse('blog:category_detail', args=[category['slug']])
+        url = reverse("blog:category_detail", args=[category["slug"]])
         links.append(f'<p><a href="{url}">{category["name"]}</a></p>')
-    
-    return HttpResponse(f"""
-        <h1>Каталог категорий</h1>
-        {''.join(links)}
-        <p><a href="{reverse('blog:posts')}">К списку постов</a></p>
-    """)
+
+    context = {
+        "title": "Категории",
+        "text": "Текст страницы с категориями",
+        "categories": CATEGORIES,
+    }
+    return render(request, "catalog_categories.html", context)
 
 def category_detail(request, category_slug):
     category = [cat for cat in CATEGORIES if cat['slug'] == category_slug][0]

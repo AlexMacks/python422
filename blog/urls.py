@@ -6,6 +6,6 @@ from django.urls import include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', main),
+    path("", main, name="main"),
     path('posts/', include('python_blog.urls')),
 ]
