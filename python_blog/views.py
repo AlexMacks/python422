@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.http import HttpResponse 
 from django.urls import reverse
+from .blog_data import dataset
 
 # Create your views here.
 CATEGORIES = [
