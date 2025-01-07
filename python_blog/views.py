@@ -22,6 +22,13 @@ def main(request):
     }
     return render(request, "main.html", context)
 
+def about(request):
+    context = {
+        "title": "О компании",
+        "text": "Мы - команда профессионалов в области веб-разработки",
+    }
+    return render(request, "about.html", context)
+
 
 def catalog_categories(request):
     links = []
