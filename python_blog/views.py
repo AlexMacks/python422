@@ -2,15 +2,9 @@ from django.shortcuts import render
 from django.http import HttpResponse 
 from django.urls import reverse
 from .blog_data import dataset
+from .models import Post, Category
 
 # Create your views here.
-CATEGORIES = [
-    {'slug': 'python', 'name': 'Python'},
-    {'slug': 'django', 'name': 'Django'},
-    {'slug': 'postgresql', 'name': 'PostgreSQL'},
-    {'slug': 'docker', 'name': 'Docker'},
-    {'slug': 'linux', 'name': 'Linux'},
-]
 
 def main(request):
     catalog_categories_url = reverse('blog:categories')
@@ -31,10 +25,7 @@ def about(request):
 
 
 def catalog_categories(request):
-    links = []
-    for category in CATEGORIES:
-        url = reverse("blog:category_detail", args=[category["slug"]])
-        links.append(f'<p><a href="{url}">{category["name"]}</a></p>')
+    CATEGORIES = Category.objects.all()
 
     context = {
         "title": "Категории",
@@ -44,17 +35,13 @@ def catalog_categories(request):
     return render(request, "catalog_categories.html", context)
 
 def category_detail(request, category_slug):
-    category = [cat for cat in CATEGORIES if cat['slug'] == category_slug][0]
-    
-    if category:
-        name = category['name']
-    else:
-        name = category_slug
-        
-    return HttpResponse(f"""
-        <h1>Категория: {name}</h1>
-        <p><a href="{reverse('blog:categories')}">Назад к категориям</a></p>
-    """)
+
+    category = Category.objects.filter(slug=category_slug).first()
+    posts = Post.objects.filter(category=category)
+
+    return render(
+        request, "category_detail.html", {"category": category, "posts": posts}
+    )
 
 def catalog_tags(request):
     return HttpResponse("Каталог тегов")

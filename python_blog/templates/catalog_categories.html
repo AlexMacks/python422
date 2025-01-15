@@ -9,8 +9,12 @@
     
     <p>Это категория: {{ category.name }}</p>
     <p>Слаг: {{ category.slug }}</p>
+    {% comment %} Так можно но не нужно {% endcomment %}
+    {% comment %} <a href="{{ category.slug }}">{{ category.name }}</a> {% endcomment %}
     {% comment %} А так нужно. Это шаблонный тег URL который найдет маршрут по псевдониму {% endcomment %}
-    <a href="{% url "blog:category_detail" category.slug  %}">{{ category.name }}</a>
+    {% comment %} <a href="{% url "blog:category_detail" category.slug  %}">{{ category.name }}</a> {% endcomment %}
+    {% comment %} Пример ссылки с get_absolute_url {% endcomment %}
+    <a href="{{ category.get_absolute_url }}">{{ category.name }}</a>
     <hr>
     {% endfor %}
     {% endblock %}
