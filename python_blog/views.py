@@ -2,7 +2,8 @@ from django.shortcuts import render
 from django.http import HttpResponse 
 from django.urls import reverse
 from .blog_data import dataset
-from .models import Post, Category
+from .models import Post, Category, Tag
+from django.db.models import Count
 
 # Create your views here.
 
@@ -44,7 +45,14 @@ def category_detail(request, category_slug):
     )
 
 def catalog_tags(request):
-    return HttpResponse("Каталог тегов")
+    tags = Tag.objects.annotate(posts_count=Count('posts')).order_by('-posts_count')
+    
+    context = {
+        'tags': tags,
+        'title': 'Теги блога',
+        'active_menu': 'tags'
+    }
+    return render(request, 'catalog_tags.html', context)
 
 def tag_detail(request, tag_slug):
     return HttpResponse(f"страница тега {tag_slug} ")
