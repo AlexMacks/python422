@@ -1,0 +1,49 @@
+{% extends "base.html" %}
+
+{% block title %}
+{{ tag.name }} | Тег
+{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row mb-4">
+        <div class="col-12">
+            <nav aria-label="breadcrumb">
+                <ol class="breadcrumb d-flex align-items-center">
+                    <li class="breadcrumb-item">
+                        <a href="{% url 'blog:tags' %}" class="badge bg-dark text-white text-decoration-none">
+                            <i class="bi bi-tags"></i> Теги
+                        </a>
+                    </li>
+                    <li class="breadcrumb-item">
+                        <span class="badge bg-warning text-dark">#{{ tag.name }}</span>
+                    </li>
+                </ol>
+            </nav>
+            
+            <div class="card border-dark mb-4">
+                <div class="card-body">
+                    <h1 class="card-title text-dark">
+                        <i class="bi bi-tag"></i> #{{ tag.name }}
+                    </h1>
+                    <span class="badge bg-warning text-dark">
+                        <i class="bi bi-file-text"></i> {{ tag.posts.count }} постов
+                    </span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-12">
+            {% for post in posts %}
+                {% include 'post_preview_include.html' %}
+            {% empty %}
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle"></i> С этим тегом пока нет постов
+                </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -55,7 +55,16 @@ def catalog_tags(request):
     return render(request, 'catalog_tags.html', context)
 
 def tag_detail(request, tag_slug):
-    return HttpResponse(f"страница тега {tag_slug} ")
+        # Получаем все посты конкретного тега через многие-ко-многим
+    tag = Tag.objects.get(slug=tag_slug)
+    posts = tag.posts.all()
+    context = {
+        "tag": tag,
+        "posts": posts,
+        "title": f"Тег: {tag.name}",
+        "active_menu": "tags",  # Добавляем флаг активного меню
+    }
+    return render(request, "tag_detail.html", context)
 
 def catalog_posts(request):
         # Получаем все опубликованные посты
