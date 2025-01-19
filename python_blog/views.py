@@ -68,7 +68,7 @@ def tag_detail(request, tag_slug):
 
 def catalog_posts(request):
         # Получаем все опубликованные посты
-    posts = Post.objects.all()
+    posts = Post.objects.select_related('category', 'author').prefetch_related('tags').all()
     context = {"title": "Блог", "posts": posts}
     return render(request, "blog.html", context)
 
