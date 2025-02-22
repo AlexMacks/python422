@@ -1,22 +1,246 @@
+/* Базовая структура страницы */
 body {
-    font-family: Arial, sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
     margin: 0;
     padding: 20px;
-    background-color: #f0f0f0;
-}
-nav ul {
+    background-color: #f8f9fa;
+    font-family: Arial, sans-serif;
+  }
+  
+  main {
+    flex: 1;
+  }
+  
+  footer {
+    margin-top: auto;
+    padding: 20px;
+    text-align: center;
+    background-color: #212529;
+    color: #ffffff;
+  }
+  
+  /* Навигация - базовые стили */
+  nav ul {
     list-style: none;
     padding: 0;
-}
-nav ul li {
+  }
+  
+  nav ul li {
     display: inline;
     margin-right: 20px;
-}
-
-.active {
-    color: #ffffff;
-    background-color: #007bff;
+  }
+  
+  nav ul li a {
+      color: #212529;
+      text-decoration: none;
+  }
+  
+  nav ul li a:hover {
+      color: #000000;
+      text-decoration: none;
+  }
+  
+  /* Bootstrap Navbar кастомизация */
+  .navbar {
+      background-color: #f8f9fa;
+      padding: 1rem;
+  }
+  
+  .navbar-nav {
+      width: 100%;
+  }
+  
+  .nav-link {
+      color: #212529;
+      text-decoration: none;
+      padding: 0.5rem 1rem;
+  }
+  
+  .nav-link:hover {
+      color: #000000;
+  }
+  
+  /* Активные элементы навигации */
+  .active {
+    color: #000000;
+    background-color: #ffc107;
     padding: 8px 16px;
     border-radius: 4px;
     text-decoration: none;
+  }
+  
+  .nav-link.active {
+      color: #000000;
+      background-color: #ffc107;
+      border-radius: 4px;
+  }
+  
+  /* Медиа-запросы для мобильных устройств */
+  @media (max-width: 991px) {
+      .navbar-nav {
+          padding: 1rem 0;
+      }
+      
+      .nav-item {
+          margin-bottom: 0.5rem;
+      }
+      
+      .nav-link.active {
+          display: inline-block;
+      }
+  }
+  
+
+.stats-text {
+    white-space: nowrap;
+}
+
+@media (max-width: 768px) {
+    .stats {
+        font-size: 0.9rem;
+    }
+}
+
+.tag-item {
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.tag-item:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+}
+
+/* Стили для формы поиска */
+.form-check {
+    margin-bottom: 0.5rem;
+    padding-left: 1.75rem;
+}
+
+/* Стили для активных чекбоксов и радиокнопок */
+.form-check-input:checked {
+    background-color: #212529;
+    border-color: #212529;
+}
+
+/* Стили для состояния фокуса */
+.form-check-input:focus {
+    border-color: #6c757d;
+    box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.25);
+}
+
+.form-control:focus {
+    border-color: #6c757d;
+    box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.25);
+}
+
+/* Стили для аккордеона */
+.accordion-button:not(.collapsed) {
+    background-color: #212529;
+    color: white;
+}
+
+.accordion-button:focus {
+    border-color: #6c757d;
+    box-shadow: 0 0 0 0.25rem rgba(108, 117, 125, 0.25);
+}
+
+.accordion-item {
+    margin-bottom: 0.5rem;
+}
+
+/* Изменение цвета иконки аккордеона */
+.accordion-button:not(.collapsed)::after {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23fff'%3e%3cpath fill-rule='evenodd' d='M1.646 4.646a.5.5 0 0 1 .708 0L8 10.293l5.646-5.647a.5.5 0 0 1 .708.708l-6 6a.5.5 0 0 1-.708 0l-6-6a.5.5 0 0 1 0-.708z'/%3e%3c/svg%3e");
+}
+
+/* Стили для пагинатора */
+.pagination .page-link {
+    color: #6c757d;  /* Серый цвет для неактивных кнопок */
+    border-color: #6c757d;
+    background-color: transparent;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #212529;  /* Черный цвет для активной кнопки */
+    border-color: #212529;
+    color: #fff;
+}
+
+.pagination .page-link:hover {
+    background-color: #ffc107;  /* Желтый при наведении */
+    border-color: #212529;
+    color: #212529;
+}
+
+.pagination .page-link:focus {
+    box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.25);  /* Тень при фокусе */
+}
+
+.page-goto input[type="number"] {
+    border-color: #212529;
+}
+
+.page-goto input[type="number"]:focus {
+    border-color: #212529;
+    box-shadow: 0 0 0 0.25rem rgba(33, 37, 41, 0.25);
+}
+
+.page-goto .btn:hover {
+    background-color: #ffc107;
+    border-color: #212529;
+    color: #212529;
+}
+
+/* Стили для формы категории */
+/* Стили для формы создания/обновления */
+.form-container {
+    max-width: 600px;
+    margin: 20px auto;
+    padding: 20px;
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0,0,0,0.1);
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: bold;
+    color: #333;
+}
+
+.form-group input[type="text"],
+.form-group textarea {
+    width: 100%;
+    padding: 8px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 16px;
+}
+
+.form-group textarea {
+    min-height: 100px;
+    resize: vertical;
+}
+
+.form-submit {
+    background-color: #212529;
+    color: white;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s;
+}
+
+.form-submit:hover {
+    background-color: #0056b3;
 }

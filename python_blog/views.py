@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.urls import reverse
 from .blog_data import dataset
 from .models import Post, Category, Tag
-from django.db.models import Count
+from django.db.models import Count, Q, F
 
 # Create your views here.
 
@@ -23,6 +23,54 @@ def about(request):
         "text": "Мы - команда профессионалов в области веб-разработки",
     }
     return render(request, "about.html", context)
+
+def catalog_posts(request):
+    # Базовый QuerySet с оптимизацией запросов
+    posts = Post.objects.select_related('category', 'author').prefetch_related('tags').all()
+    
+    # Получаем строку поиска
+    search_query = request.GET.get('search_query', '')
+    
+    if search_query:
+        # Создаем пустой Q объект
+        q_object = Q()
+        
+        # Добавляем условия поиска если включены соответствующие чекбоксы
+        if request.GET.get('search_content') == '1':
+            q_object |= Q(content__icontains=search_query)
+            
+        if request.GET.get('search_title') == '1':
+            q_object |= Q(title__icontains=search_query)
+            
+        if request.GET.get('search_tags') == '1':
+            q_object |= Q(tags__name__icontains=search_query)
+            
+        if request.GET.get('search_category') == '1':
+            q_object |= Q(category__name__icontains=search_query)
+            
+        if request.GET.get('search_slug') == '1':
+            q_object |= Q(slug__icontains=search_query)
+        
+        # Применяем фильтрацию если есть хотя бы одно условие
+        if q_object:
+            posts = posts.filter(q_object).distinct()
+    
+    # Сортировка результатов
+    sort_by = request.GET.get('sort_by', 'created_date')
+    
+    if sort_by == 'view_count':
+        posts = posts.order_by('-views')
+    elif sort_by == 'update_date':
+        posts = posts.order_by('-updated_at')
+    else:
+        posts = posts.order_by('-created_at')
+    
+    context = {
+        'title': 'Блог',
+        'posts': posts,
+    }
+    
+    return render(request, 'blog.html', context)
 
 
 def catalog_categories(request):
@@ -66,14 +114,35 @@ def tag_detail(request, tag_slug):
     }
     return render(request, "tag_detail.html", context)
 
-def catalog_posts(request):
-        # Получаем все опубликованные посты
-    posts = Post.objects.select_related('category', 'author').prefetch_related('tags').all()
-    context = {"title": "Блог", "posts": posts}
-    return render(request, "blog.html", context)
 
 def post_detail(request, post_slug):
-    post = Post.objects.get(slug=post_slug)
+    """
+    Вью детального отображения поста.
+    Увеличивает количество просмотров поста через F-объект.
+    """
+
+    # Получаем пост
+
+    post = (
+        Post.objects.select_related("category", "author")
+        .prefetch_related("tags")
+        .get(slug=post_slug)
+    )
+
+    # Добываем сессию
+    session = request.session
+
+    # Формируем ключ для сессии
+    key = f"viewed_posts_{post.id}"
+
+    # Если пост не был просмотрен
+    if key not in session:
+        # Увеличиваем количество просмотров
+        Post.objects.filter(id=post.id).update(views=F("views") + 1)
+        # Записываем в сессию, что пост был просмотрен
+        session[key] = True
+        post.refresh_from_db()  # Обновляем объект
+
     context = {"title": post.title, "post": post}
     return render(request, "post_detail.html", context)
 
