@@ -6,6 +6,7 @@ from .models import Post, Category, Tag
 from django.db.models import Count, Q, F
 from django.contrib.messages import constants as messages
 from django.contrib import messages
+from django.core.paginator import Paginator
 
 # Create your views here.
 
@@ -74,10 +75,20 @@ def catalog_posts(request):
         posts = posts.order_by('-updated_at')
     else:
         posts = posts.order_by('-created_at')
+        
+    # Создаем объект пагинатора, 2 поста на страницу
+    paginator = Paginator(posts, 2)
+    
+    # Получаем номер текущей страницы
+    page_number = request.GET.get('page', 1)
+    
+    # Получаем объект страницы
+    page_obj = paginator.get_page(page_number)
     
     context = {
         'title': 'Блог',
-        'posts': posts,
+        'posts': page_obj,  # Теперь передаем страницу вместо queryset
+        'page_obj': page_obj,  # Добавляем объект страницы в контекст
     }
     
     return render(request, 'blog.html', context)
