@@ -4,8 +4,18 @@ from django.urls import reverse
 from .blog_data import dataset
 from .models import Post, Category, Tag
 from django.db.models import Count, Q, F
+from django.contrib.messages import constants as messages
+from django.contrib import messages
 
 # Create your views here.
+
+MESSAGE_TAGS = {
+    messages.DEBUG: "primary",
+    messages.INFO: "info",
+    messages.SUCCESS: "success",
+    messages.WARNING: "warning",
+    messages.ERROR: "danger",
+}
 
 def main(request):
     catalog_categories_url = reverse('blog:categories')
@@ -117,18 +127,14 @@ def tag_detail(request, tag_slug):
 
 def post_detail(request, post_slug):
     """
-    Вью детального отображения поста.
+    Вью детального отображения поста. 
     Увеличивает количество просмотров поста через F-объект.
     """
 
     # Получаем пост
-
-    post = (
-        Post.objects.select_related("category", "author")
-        .prefetch_related("tags")
-        .get(slug=post_slug)
-    )
-
+    
+    post = Post.objects.select_related("category", "author").prefetch_related("tags").get(slug=post_slug)
+    
     # Добываем сессию
     session = request.session
 
@@ -141,9 +147,8 @@ def post_detail(request, post_slug):
         Post.objects.filter(id=post.id).update(views=F("views") + 1)
         # Записываем в сессию, что пост был просмотрен
         session[key] = True
-        post.refresh_from_db()  # Обновляем объект
-
+        post.refresh_from_db()    # Обновляем объект
+    
+    
     context = {"title": post.title, "post": post}
     return render(request, "post_detail.html", context)
-
-
