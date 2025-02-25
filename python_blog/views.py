@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.http import HttpResponse 
 from django.urls import reverse
 from .blog_data import dataset
@@ -7,6 +7,7 @@ from django.db.models import Count, Q, F
 from django.contrib.messages import constants as messages
 from django.contrib import messages
 from django.core.paginator import Paginator
+from .forms import TagForm, PostForm
 
 # Create your views here.
 
@@ -113,6 +114,58 @@ def category_detail(request, category_slug):
         request, "category_detail.html", {"category": category, "posts": posts}
     )
 
+def category_create(request):
+    if request.method == "POST":
+        name = request.POST.get("name")
+        description = request.POST.get("description")
+
+        if name:
+            category = Category.objects.create(
+                name=name, description=description or "Без описания"
+            )
+            messages.success(request, f'Категория "{category.name}" успешно создана!')
+            return redirect("blog:categories")
+
+    context = {
+        "title": "Создание категории",
+        "button_text": "Создать категорию",
+        "action_url": reverse("blog:category_create"),
+    }
+    return render(request, "category_create.html", context)
+
+def category_update(request, category_slug):
+    # Получаем объект категории по slug
+    category = Category.objects.get(slug=category_slug)
+
+    if request.method == "POST":
+        # Получаем данные из формы
+        name = request.POST.get("name")
+        description = request.POST.get("description")
+
+        if name:
+            # Обновляем поля категории
+            category.name = name
+            category.description = description or "Без описания"
+            # Сохраняем изменения
+            category.save()
+            # Добавляем сообщение об успешном обновлении
+            messages.success(request, f'Категория "{category.name}" успешно обновлена!')
+            # Перенаправляем на список категорий
+            return redirect("blog:categories")
+
+    # Контекст для GET запроса
+    context = {
+        "title": "Обновление категории",
+        "button_text": "Обновить категорию",
+        "action_url": reverse(
+            "blog:category_update", kwargs={"category_slug": category_slug}
+        ),
+        "category": category,
+    }
+
+    # Используем тот же шаблон что и для создания
+    return render(request, "category_create.html", context)
+
 def catalog_tags(request):
     tags = Tag.objects.annotate(posts_count=Count('posts')).order_by('-posts_count')
     
@@ -135,17 +188,39 @@ def tag_detail(request, tag_slug):
     }
     return render(request, "tag_detail.html", context)
 
+def tag_create(request):
+    if request.method == 'POST':
+        form = TagForm(request.POST)
+        if form.is_valid():
+            tag = form.save()  # Сохраняем тег через форму
+            messages.success(request, f'Тег "{tag.name}" успешно создан!')
+            return redirect('blog:tags')
+    else:
+        form = TagForm()
+    
+    context = {
+        'title': 'Создание тега',
+        'button_text': 'Создать тег',
+        'action_url': reverse('blog:tag_create'),
+        'form': form
+    }
+    return render(request, 'tag_form.html', context)
+
 
 def post_detail(request, post_slug):
     """
-    Вью детального отображения поста. 
+    Вью детального отображения поста.
     Увеличивает количество просмотров поста через F-объект.
     """
 
     # Получаем пост
-    
-    post = Post.objects.select_related("category", "author").prefetch_related("tags").get(slug=post_slug)
-    
+
+    post = (
+        Post.objects.select_related("category", "author")
+        .prefetch_related("tags")
+        .get(slug=post_slug)
+    )
+
     # Добываем сессию
     session = request.session
 
@@ -158,8 +233,47 @@ def post_detail(request, post_slug):
         Post.objects.filter(id=post.id).update(views=F("views") + 1)
         # Записываем в сессию, что пост был просмотрен
         session[key] = True
-        post.refresh_from_db()    # Обновляем объект
-    
-    
+        post.refresh_from_db()  # Обновляем объект
+
     context = {"title": post.title, "post": post}
     return render(request, "post_detail.html", context)
+
+def post_create(request):
+    if request.method == 'POST':
+        form = PostForm(request.POST)
+        if form.is_valid():
+            post = form.save(commit=True)
+            messages.success(
+                request, 
+                'Ваш пост успешно создан и отправлен на модерацию. После проверки он появится на сайте.'
+            )
+            return redirect('blog:posts')
+    else:
+        form = PostForm()
+    
+    context = {
+        'title': 'Создание поста',
+        'button_text': 'Создать пост',
+        'action_url': reverse('blog:post_create'),
+        'form': form
+    }
+    return render(request, 'tag_form.html', context)
+
+def post_update(request, post_slug):
+    post = Post.objects.get(slug=post_slug)
+    if request.method == 'POST':
+        form = PostForm(request.POST, instance=post)
+        if form.is_valid():
+            post = form.save()
+            messages.success(request, 'Пост успешно обновлен и отправлен на модерацию')
+            return redirect('blog:post_detail', post_slug=post.slug)
+    else:
+        form = PostForm(instance=post)
+    
+    context = {
+        'title': 'Редактирование поста',
+        'button_text': 'Обновить пост',
+        'action_url': reverse('blog:post_update', kwargs={'post_slug': post_slug}),
+        'form': form
+    }
+    return render(request, 'post_form.html', context)
