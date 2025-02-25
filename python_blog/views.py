@@ -38,61 +38,71 @@ def about(request):
 
 def catalog_posts(request):
     # Базовый QuerySet с оптимизацией запросов
-    posts = Post.objects.select_related('category', 'author').prefetch_related('tags').all()
-    
+    # Фильтрация по status=published
+    # posts = (
+    #     Post.objects.select_related("category", "author").prefetch_related("tags").all()
+    # )
+
+    posts = (
+        Post.objects.select_related("category", "author")
+        .prefetch_related("tags")
+        .filter(status="published")
+    )
+
     # Получаем строку поиска
-    search_query = request.GET.get('search_query', '')
-    
+    search_query = request.GET.get("search_query", "")
+
     if search_query:
         # Создаем пустой Q объект
         q_object = Q()
-        
+
         # Добавляем условия поиска если включены соответствующие чекбоксы
-        if request.GET.get('search_content') == '1':
+        if request.GET.get("search_content") == "1":
             q_object |= Q(content__icontains=search_query)
-            
-        if request.GET.get('search_title') == '1':
+
+        if request.GET.get("search_title") == "1":
             q_object |= Q(title__icontains=search_query)
-            
-        if request.GET.get('search_tags') == '1':
+
+        if request.GET.get("search_tags") == "1":
             q_object |= Q(tags__name__icontains=search_query)
-            
-        if request.GET.get('search_category') == '1':
+
+        if request.GET.get("search_category") == "1":
             q_object |= Q(category__name__icontains=search_query)
-            
-        if request.GET.get('search_slug') == '1':
+
+        if request.GET.get("search_slug") == "1":
             q_object |= Q(slug__icontains=search_query)
-        
+
         # Применяем фильтрацию если есть хотя бы одно условие
         if q_object:
             posts = posts.filter(q_object).distinct()
-    
+
     # Сортировка результатов
-    sort_by = request.GET.get('sort_by', 'created_date')
-    
-    if sort_by == 'view_count':
-        posts = posts.order_by('-views')
-    elif sort_by == 'update_date':
-        posts = posts.order_by('-updated_at')
+    sort_by = request.GET.get("sort_by", "created_date")
+
+    if sort_by == "view_count":
+        posts = posts.order_by("-views")
+    elif sort_by == "update_date":
+        posts = posts.order_by("-updated_at")
     else:
-        posts = posts.order_by('-created_at')
-        
+        posts = posts.order_by("-created_at")
+
     # Создаем объект пагинатора, 2 поста на страницу
     paginator = Paginator(posts, 2)
-    
+
     # Получаем номер текущей страницы
-    page_number = request.GET.get('page', 1)
-    
+    page_number = request.GET.get("page", 1)
+
     # Получаем объект страницы
     page_obj = paginator.get_page(page_number)
-    
+
     context = {
-        'title': 'Блог',
-        'posts': page_obj,  # Теперь передаем страницу вместо queryset
-        'page_obj': page_obj,  # Добавляем объект страницы в контекст
+        "title": "Блог",
+        "posts": page_obj,  # Теперь передаем страницу вместо queryset
+        "page_obj": page_obj,  # Добавляем объект страницы в контекст
     }
-    
-    return render(request, 'blog.html', context)
+
+    return render(request, "blog.html", context)
+
 
 
 def catalog_categories(request):
