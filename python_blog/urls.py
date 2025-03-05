@@ -1,7 +1,7 @@
 # APP URLS
 from django.contrib import admin
 from django.urls import path
-from python_blog.views import catalog_categories, catalog_tags, catalog_posts, category_detail, tag_detail, post_detail, post_create, tag_create, category_create, category_update
+from python_blog.views import catalog_categories, catalog_tags, catalog_posts, category_detail, tag_detail, post_detail, post_create, tag_create, category_create, category_update, post_update
 app_name = 'blog'
 
 urlpatterns = [
@@ -27,4 +27,5 @@ urlpatterns = [
     # Посты posts/
     path("create/", post_create, name="post_create"),
     path("<slug:post_slug>/", post_detail, name="post_detail"),
+    path('<slug:post_slug>/update/', post_update, name='post_update'),
 ]
